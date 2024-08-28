@@ -16,6 +16,7 @@ class DemandeDocument extends Model
     protected $fillable = [
         'nom',
         'prenom',
+        'email',
         'date_naissance',
         'cin',
         'filere',

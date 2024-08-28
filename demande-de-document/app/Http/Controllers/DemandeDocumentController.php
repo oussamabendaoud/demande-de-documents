@@ -10,6 +10,15 @@ use Illuminate\Http\Request;
 class DemandeDocumentController extends Controller
 {
 
+    public function index()
+    {
+        // Récupérer toutes les demandes de documents
+        $demandes = DemandeDocument::all();
+
+        // Passer les demandes à la vue
+        return view('service_communication', compact('demandes'));
+    }
+
       // Méthode pour afficher le formulaire de demande de document
       public function create()
       {
@@ -20,6 +29,7 @@ class DemandeDocumentController extends Controller
         $validatedData = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
+            'email' => 'required|string|max:255',
             'date_naissance' => 'required|date',
             'cin' => 'nullable|string|max:255',
             'filere' => 'required|string|max:255',
