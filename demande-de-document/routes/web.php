@@ -28,3 +28,5 @@ Route::get('/', [DemandeDocumentController::class, 'create'])->name('demande.cre
 // Route pour traiter la soumission du formulaire
 Route::post('/demande-document', [DemandeDocumentController::class, 'store'])->name('demande.store');
 Route::get('/service-communication', [DemandeDocumentController::class, 'index'])->name('service.communication');
+Route::post('/demande/{id}/envoyer', [DemandeDocumentController::class, 'envoyer'])->name('demande.envoyer');
+Route::get('/service-scolarite', [DemandeDocumentController::class, 'scolarite'])->name('service.scolarite');

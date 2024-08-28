@@ -23,12 +23,15 @@
                 <tr>
                     <th>Nom</th>
                     <th>Prénom</th>
+                    <th>Email</th>
                     <th>Date de Naissance</th>
                     <th>CIN/Numéro de Passeport</th>
                     <th>Filière</th>
                     <th>Niveau</th>
                     <th>Attestation Demandée</th>
+                    <th>status</th>
                     <th>Date de Demande</th>
+                    <th>Action</th> <!-- Nouvelle colonne pour l'action -->
                 </tr>
             </thead>
             <tbody>
@@ -42,7 +45,15 @@
                     <td>{{ $demande->filere }}</td>
                     <td>{{ $demande->niveau }}</td>
                     <td>{{ ucfirst(str_replace('_', ' ', $demande->attestation)) }}</td>
+                    <td>{{ $demande->status }}</td>
                     <td>{{ $demande->created_at->format('d/m/Y H:i') }}</td>
+                    <td>
+                        <!-- Bouton envoyer la demande -->
+                        <form action="{{ route('demande.envoyer', $demande->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">Envoyer la demande</button>
+                        </form>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>

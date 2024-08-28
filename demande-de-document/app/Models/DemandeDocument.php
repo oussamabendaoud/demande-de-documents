@@ -22,5 +22,6 @@ class DemandeDocument extends Model
         'filere',
         'niveau',
         'attestation',
+        'status',
     ];
 }
