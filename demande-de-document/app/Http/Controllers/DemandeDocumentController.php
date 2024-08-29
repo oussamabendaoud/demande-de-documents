@@ -50,6 +50,7 @@ class DemandeDocumentController extends Controller
       {
           return view('demandedocument'); // Retourne la vue demande_document.blade.php
       }
+
       public function store(Request $request)
       {
           // Validate the request data
@@ -73,4 +74,10 @@ class DemandeDocumentController extends Controller
             return redirect()->route('demande.create')->with('success', 'Votre demande a été soumise avec succès.');
         }
       
+
+
+
+      
+      
+
 }
