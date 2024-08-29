@@ -63,13 +63,13 @@
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
         <div class="position-sticky">
           <div class="list-group list-group-flush mx-3 mt-4">
-            <a href="/service-communication" class="list-group-item list-group-item-action py-2 active" data-mdb-ripple-init aria-current="true">
+            <a href="/service-communication" class="list-group-item list-group-item-action py-2 {{ Request::is('service-communication') ? 'active' : '' }}" data-mdb-ripple-init aria-current="true">
               <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Communication</span>
             </a>
-            <a href="service-scolarite" class="list-group-item list-group-item-action py-2 " data-mdb-ripple-init>
+            <a href="/service-scolarite" class="list-group-item list-group-item-action py-2 {{ Request::is('service-scolarite') ? 'active' : '' }}" data-mdb-ripple-init>
               <i class="fas fa-chart-area fa-fw me-3"></i><span>Scolarité </span>
             </a>
-            <a href="#" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
+            <a href="/users" class="list-group-item list-group-item-action py-2 {{ Request::is('users') ? 'active' : '' }}" data-mdb-ripple-init><i
                 class="fas fa-users fa-fw me-3"></i><span>Users</span></a>
            <!-- <a href="#" class="list-group-item list-group-item-action py-2" data-mdb-ripple-init><i
                 class="fas fa-lock fa-fw me-3"></i><span>Password</span></a>
