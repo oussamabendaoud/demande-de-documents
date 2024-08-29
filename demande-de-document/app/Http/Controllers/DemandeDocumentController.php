@@ -50,21 +50,27 @@ class DemandeDocumentController extends Controller
       {
           return view('demandedocument'); // Retourne la vue demande_document.blade.php
       }
-    public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'nom' => 'required|string|max:255',
-            'prenom' => 'required|string|max:255',
-            'email' => 'required|string|max:255',
-            'date_naissance' => 'required|date',
-            'cin' => 'nullable|string|max:255',
-            'filere' => 'required|string|max:255',
-            'niveau' => 'required|in:1ere,2eme,3eme,4eme,5eme',
-            'attestation' => 'required|in:attestation_inscription,attestation_scolarite,attestation_reussite,releve_notes,convention_stage,diplome',
-        ]);
-
-        DemandeDocument::create(array_merge($validatedData, ['status' => 'nouvelle']));
-
-        return redirect()->route('demande.create')->with('success', 'Votre demande a été soumise avec succès.');
-    }
+      public function store(Request $request)
+      {
+          // Validate the request data
+          $validatedData = $request->validate([
+              'nom' => 'required|string|max:255',
+              'prenom' => 'required|string|max:255',
+              'email' => 'required|string|max:255',
+              'date_naissance' => 'required|date',
+              'cin' => 'nullable|string|max:255',
+              'filere' => 'required|string|max:255',
+              'niveau' => 'required|in:1ere,2eme,3eme,4eme,5eme',
+              'attestation' => 'required|array',
+              'attestation.*' => 'in:attestation_inscription,attestation_scolarite,attestation_reussite,releve_notes,convention_stage,diplome',
+          ]);
+            // Convert the attestation array to a JSON string
+            $validatedData['attestation'] = json_encode($validatedData['attestation']);
+        
+            // Store the demande document with status
+            DemandeDocument::create(array_merge($validatedData, ['status' => 'nouvelle']));
+        
+            return redirect()->route('demande.create')->with('success', 'Votre demande a été soumise avec succès.');
+        }
+      
 }

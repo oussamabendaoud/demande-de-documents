@@ -1,67 +1,72 @@
 <!-- resources/views/service_communication.blade.php -->
+@extends('layouts.app')
 
-<!DOCTYPE html>
-<html lang="fr">
+@section('title', 'Home Page')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service de Communication - Liste des Demandes de Documents</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
-</head>
+@section('content')
+        <main style="margin-top: 5px">
+          <div class="container pt-4">
+            <div class="container mt-5">
+                  <!-- Main Content -->
+              
+                  <!-- DataTable Code starts -->
+                <div class="jumbotron">
+                      <h2 class="mb-4">Liste des Demandes de Documents</h2>
+                      <hr class="my-4">
+                      <!-- Vérifier s'il y a des demandes -->
+                      @if($demandes->isEmpty())
+                      <p>Aucune demande de document trouvée.</p>
+                      @else
+                      <div class="container p-3 my-5 bg-light border border-primary">
+                      <table id="example" class="table table-striped nowrap" style="width:100%">
+                          <thead>
+                              <tr>
+                                  <th><small class="fw-bold sm-1">Nom</small></th>
+                                  <th><small class="fw-bold sm-1">Prénom</small></th>
+                                  <th><small class="fw-bold sm-1">Email</small></th>
+                                  <th><small class="fw-bold sm-1">Date de Demande</small></th>
 
-<body>
-    <div class="container mt-5">
-        <h2 class="mb-4">Liste des Demandes de Documents</h2>
+                                  <th><small class="fw-bold sm-1">CIN/Numéro de Passeport</small></th>
+                                  <th><small class="fw-bold sm-1">Filière</small></th>
+                                  <th><small class="fw-bold sm-1">Niveau</small></th>
+                                  <th><small class="fw-bold sm-1">Attestation Demandée</small></th>
+                                  <th><small class="fw-bold sm-1">status</small></th>
+                                  <th><small class="fw-bold sm-1">Date de Naissance</small></th>
+                                  <th><small class="fw-bold sm-1">Action</small></th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              @foreach($demandes as $demande)
+                              <tr>
+                                  <td>{{ $demande->nom }}</td>
+                                  <td>{{ $demande->prenom }}</td>
+                                  <td>{{ $demande->email }}</td>
+                                  <td>
+                                      <p class="fw-normal sm-1">{{ $demande->created_at->format('d/m/Y H:i') }}</p>
+                                  </td>
+                                  <td>{{ $demande->cin }}</td>
+                                  <td>{{ $demande->filere }}</td>
+                                  <td>{{ $demande->niveau }}</td>
+                                  <td>{{ ucfirst(str_replace('_', ' ', $demande->attestation)) }}</td>
+                                  <td>
+                                  <span class="badge badge-danger rounded-pill d-inline">{{ $demande->status }}</span>
+                                  </td>
 
-        <!-- Vérifier s'il y a des demandes -->
-        @if($demandes->isEmpty())
-        <p>Aucune demande de document trouvée.</p>
-        @else
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Prénom</th>
-                    <th>Email</th>
-                    <th>Date de Naissance</th>
-                    <th>CIN/Numéro de Passeport</th>
-                    <th>Filière</th>
-                    <th>Niveau</th>
-                    <th>Attestation Demandée</th>
-                    <th>status</th>
-                    <th>Date de Demande</th>
-                    <th>Action</th> <!-- Nouvelle colonne pour l'action -->
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($demandes as $demande)
-                <tr>
-                    <td>{{ $demande->nom }}</td>
-                    <td>{{ $demande->prenom }}</td>
-                    <td>{{ $demande->email }}</td>
-                    <td>{{ $demande->date_naissance }}</td>
-                    <td>{{ $demande->cin }}</td>
-                    <td>{{ $demande->filere }}</td>
-                    <td>{{ $demande->niveau }}</td>
-                    <td>{{ ucfirst(str_replace('_', ' ', $demande->attestation)) }}</td>
-                    <td>{{ $demande->status }}</td>
-                    <td>{{ $demande->created_at->format('d/m/Y H:i') }}</td>
-                    <td>
-                        <!-- Bouton envoyer la demande -->
-                        <form action="{{ route('demande.envoyer', $demande->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-primary">Envoyer la demande</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        @endif
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+                                  <td>{{ $demande->date_naissance }}</td>
+                                  <td>
+                                      <form action="{{ route('demande.envoyer', $demande->id) }}" method="POST">
+                                          @csrf
+                                          <button type="submit" class="btn btn-primary">Envoyer la demande</button>
+                                      </form>
+                                  </td>
+                              </tr>
+                              @endforeach
+                          </tbody>
+                      </table>
+                      @endif
+                  </div>
+              </div>
+            </div>
+          </div>
+    </main>
+    @endsection
