@@ -5,10 +5,29 @@ namespace App\Http\Controllers;
 // app/Http/Controllers/DemandeDocumentController.php
 
 use App\Models\DemandeDocument;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use App\Mail\DocumentEnvoye;
 
 class DemandeDocumentController extends Controller
 {
+
+
+    public function envoyerDocument(Request $request, $id)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240',  // Maximum 10MB
+        ]);
+
+        $demande = DemandeDocument::findOrFail($id);
+        $document = $request->file('file');
+
+        // Envoyer l'email avec le document attaché
+        Mail::to($demande->email)->send(new DocumentEnvoye($document, $demande->nom));
+
+        return redirect()->back()->with('success', 'Le document a été envoyé avec succès à l\'étudiant.');
+    }
+
 
     public function scolarite()
 {
@@ -51,6 +70,7 @@ class DemandeDocumentController extends Controller
           return view('demandedocument'); // Retourne la vue demande_document.blade.php
       }
 
+ 
       public function store(Request $request)
       {
           // Validate the request data

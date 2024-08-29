@@ -1,16 +1,16 @@
     <!-- resources/views/service_scolarite.blade.php -->
-@extends('layouts.app')
+    @extends('layouts.app')
 
-@section('title', 'Home Page')
-    
-@section('content')
+    @section('title', 'Home Page')
+
+    @section('content')
     <main style="margin-top: 5px">
         <div class="container pt-4">
-        <div class="container mt-5">
+            <div class="container mt-5">
                 <!-- Main Content -->
-            
+
                 <!-- DataTable Code starts -->
-            <div class="jumbotron">
+                <div class="jumbotron">
                     <h2 class="mb-4">Liste des Demandes de Documents - Statut : Envoyée</h2>
                     <hr class="my-4">
 
@@ -29,7 +29,8 @@
                                 <th>Filière</th>
                                 <th>Niveau</th>
                                 <th>Attestation Demandée</th>
-                                <th>Date de Naissance</th>       
+                                <th>Date de Naissance</th>
+                                <th>envoyer le document</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -42,16 +43,29 @@
                                 <td>{{ $demande->cin }}</td>
                                 <td>{{ $demande->filere }}</td>
                                 <td>{{ $demande->niveau }}</td>
-                                <td>{{ ucfirst(str_replace('_', ' ', $demande->attestation)) }}</td>
+                                <td>{{ ucfirst(str_replace('_', ' ', $demande->attestations)) }}</td>
                                 <td>{{ $demande->date_naissance }}</td>
-                                
+                                <td>
+                                    <form action="{{ route('demande.envoyer_document', ['id' => $demande->id]) }}"
+                                        method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="mb-3">
+                                            <label for="file" class="form-label">Choisir fichier :</label>
+                                            <input type="file" id="file" name="file" class="form-control" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Envoyer le document</button>
+                                    </form>
+
+
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
+
                     </table>
                     @endif
                 </div>
             </div>
         </div>
     </main>
-@endsection
+    @endsection
