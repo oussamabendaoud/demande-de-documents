@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 // app/Http/Controllers/DemandeDocumentController.php
 
 use App\Models\DemandeDocument;
+use App\Models\Archive;
+use App\Models\DemandeArchive;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Mail\DocumentEnvoye;
@@ -13,47 +15,110 @@ class DemandeDocumentController extends Controller
 {
 
 
-    public function envoyerDocument(Request $request, $id)
-    {
-        $request->validate([
-            'file' => 'required|file|max:10240',  // Maximum 10MB
+    public function archiverDemandesEnvoyees()
+{
+    // Récupérer les demandes avec le statut "envoyé"
+    $demandesEnvoyees = DemandeDocument::where('status', 'envoyé')->get();
+
+    foreach ($demandesEnvoyees as $demande) {
+        // Archiver la demande dans la table demande_archive
+        DemandeArchive::create([
+            'nom' => $demande->nom,
+            'prenom' => $demande->prenom,
+            'email' => $demande->email,
+            'date_naissance' => $demande->date_naissance,
+            'cin' => $demande->cin,
+            'filere' => $demande->filere,
+            'niveau' => $demande->niveau,
+            'attestations' => $demande->attestations,
+            'created_at' => $demande->created_at,
+            'updated_at' => now(),
         ]);
 
-        $demande = DemandeDocument::findOrFail($id);
-        $document = $request->file('file');
-
-        // Envoyer l'email avec le document attaché
-        Mail::to($demande->email)->send(new DocumentEnvoye($document, $demande->nom));
-
-        return redirect()->back()->with('success', 'Le document a été envoyé avec succès à l\'étudiant.');
+        // Supprimer la demande de la table "demande_documents"
+        $demande->delete();
     }
 
-
-    public function scolarite()
-{
-    // Récupérer les demandes avec le statut "envoyée"
-    $demandes = DemandeDocument::where('status', 'envoyée')->get();
-
-    // Passer les demandes à la vue
-    return view('service_scolarite', compact('demandes'));
+    // Rediriger avec un message de succès
+    return redirect()->route('service.communication')->with('success', 'Les demandes envoyées ont été archivées avec succès.');
 }
 
-
-    public function envoyer($id)
+public function envoyerDocument(Request $request, $id)
 {
-    // Rechercher la demande de document par son ID
-    $demande = DemandeDocument::findOrFail($id);
+    $request->validate([
+        'file' => 'required|file|max:10240',  // Maximum 10MB
+    ]);
 
-    // Ici, ajoutez la logique pour envoyer la demande au service scolarité
-    // Par exemple, vous pouvez envoyer un email, mettre à jour l'état de la demande, etc.
+    // Récupérer la demande
+    $demande = DemandeArchive::findOrFail($id); // Change to DemandeArchive
+    $document = $request->file('file');
 
-    // Exemple : Mettre à jour un champ 'envoyée' pour indiquer que la demande a été envoyée
-    $demande->update(['status' => 'envoyée']);
+    // Envoyer l'email avec le document attaché
+    Mail::to($demande->email)->send(new DocumentEnvoye($document, $demande->nom));
+
+    // Vérifier que 'attestations' n'est pas null ou vide, sinon définir une valeur par défaut
+    $attestations = $demande->attestations ?: 'Aucune attestation spécifiée';
+
+    // Archiver la demande
+    Archive::create([
+        'nom' => $demande->nom,
+        'prenom' => $demande->prenom,
+        'email' => $demande->email,
+        'date_naissance' => $demande->date_naissance,
+        'cin' => $demande->cin,
+        'filere' => $demande->filere,
+        'niveau' => $demande->niveau,
+        'attestations' => $attestations,
+        'created_at' => $demande->created_at,
+        'updated_at' => now(),
+    ]);
+
+    // Supprimer la demande de la table "demande_archive"
+    $demande->delete();
 
     // Rediriger avec un message de succès
-    return redirect()->route('service.communication')->with('success', 'La demande a été envoyée avec succès.');
+    return redirect()->route('service.scolarite')->with('success', 'Le document a été envoyé, la demande a été archivée et supprimée de la liste.');
 }
 
+    public function scolarite()
+    {
+        // Récupérer toutes les demandes de la table demande_archive
+        $demandes = DemandeArchive::all();
+
+        // Passer les demandes à la vue
+        return view('service_scolarite', compact('demandes'));
+    }
+    
+
+
+public function envoyer(Request $request, $id)
+{
+    // Récupérer la demande
+    $demande = DemandeDocument::findOrFail($id);
+
+    // Vérifier que 'attestations' n'est pas null ou vide, sinon définir une valeur par défaut
+    $attestations = $demande->attestations ?: 'Aucune attestation spécifiée';
+
+    // Archiver la demande
+    DemandeArchive::create([
+        'nom' => $demande->nom,
+        'prenom' => $demande->prenom,
+        'email' => $demande->email,
+        'date_naissance' => $demande->date_naissance,
+        'cin' => $demande->cin,
+        'filere' => $demande->filere,
+        'niveau' => $demande->niveau,
+        'attestations' => $attestations,
+        'created_at' => $demande->created_at,
+        'updated_at' => now(),
+    ]);
+
+    // Supprimer la demande de la table "demande_documents"
+    $demande->delete();
+
+    // Rediriger avec un message de succès
+    return redirect()->back()->with('success', 'La demande a été envoyée, archivée et supprimée de la liste.');
+}
 
     public function index()
     {
@@ -70,31 +135,31 @@ class DemandeDocumentController extends Controller
           return view('demandedocument'); // Retourne la vue demande_document.blade.php
       }
 
- 
       public function store(Request $request)
       {
-          // Validate the request data
-          $validatedData = $request->validate([
-              'nom' => 'required|string|max:255',
-              'prenom' => 'required|string|max:255',
-              'email' => 'required|string|max:255',
+          // Validate the incoming request
+          $request->validate([
+              'nom' => 'required|string',
+              'prenom' => 'required|string',
               'date_naissance' => 'required|date',
-              'cin' => 'nullable|string|max:255',
-              'filere' => 'required|string|max:255',
-              'niveau' => 'required|in:1ere,2eme,3eme,4eme,5eme',
-              'attestation' => 'required|array',
-              'attestation.*' => 'in:attestation_inscription,attestation_scolarite,attestation_reussite,releve_notes,convention_stage,diplome',
+              'email' => 'required|email',
+              'cin' => 'required|string',
+              'filere' => 'required|string',
+              'niveau' => 'required|string',
+              'attestation' => 'required|array', // Attestation should be an array
           ]);
-            // Convert the attestation array to a JSON string
-            $validatedData['attestation'] = json_encode($validatedData['attestation']);
-        
-            // Store the demande document with status
-            DemandeDocument::create(array_merge($validatedData, ['status' => 'nouvelle']));
-        
-            return redirect()->route('demande.create')->with('success', 'Votre demande a été soumise avec succès.');
-        }
-      
-
+  
+          // Convert the attestation array to a comma-separated string
+          $data = $request->all();
+          $data['attestation'] = implode(',', $request->input('attestation')); // Convert to a comma-separated string
+  
+          // Insert the data into the database
+          DemandeDocument::create($data);
+  
+          // Redirect or return a response
+          return redirect()->back()->with('success', 'Demande enregistrée avec succès.');
+      }
+  
 
 
       

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DemandeDocumentController;
+use App\Http\Controllers\ArchiveController;
 
 
 Route::get('/', function () {
@@ -31,3 +32,9 @@ Route::get('/service-communication', [DemandeDocumentController::class, 'index']
 Route::post('/demande/{id}/envoyer', [DemandeDocumentController::class, 'envoyer'])->name('demande.envoyer');
 Route::get('/service-scolarite', [DemandeDocumentController::class, 'scolarite'])->name('service.scolarite');
 Route::post('/envoyer-document/{id}', [DemandeDocumentController::class, 'envoyerDocument'])->name('demande.envoyer_document');
+Route::post('/archiver-demandes-envoyees', [DemandeDocumentController::class, 'archiverDemandesEnvoyees'])->name('archiver_demandes_envoyees');
+                                           
+                                  /* Archive routes */
+
+Route::get('/documents-envoyes-archives', [ArchiveController::class, 'documentsEnvoyesArchives'])->name('documents.envoyes_archives');
+Route::get('/demandes-envoyes-archives', [ArchiveController::class, 'demandesEnvoyesArchives'])->name('demandes.envoyes_archives');
